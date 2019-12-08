@@ -35,7 +35,7 @@ class CSV {
             csvData = objectToArray(csvData, this.columns);
         }
 
-        csv.stringify(this.data, options, function(err, data) {
+        csv.stringify(csvData, options, function(err, data) {
             if (err) {
                 callback({message: "Unable to stringify CSV file.", err: err});
             } else {
@@ -67,12 +67,16 @@ class CSV {
      * @param {String|Array} input - The path or data of the file to read.
      * @param {readCallback} callback.
      * @param {Object|Function} [options] - Various file options.
-     * @param {Boolean} [options.headers] - If the file contains headers in the first row.
+     * @param {Boolean} [options.headers] - If the file contains headers in the first row. --default = true
      * @param {Boolean} [options.lock] - If the file should be locked before read.
      */
-    static read(input, callback, options) {
+    static read(input, callback, options = {}) {
+        if (options.headers !== false) {
+            options.headers = true;
+        }
+
         switch (true) {
-            case Array.isArray(path):
+            case Array.isArray(input):
                 parseCSV(input, callback, options);
                 break;
 
@@ -86,23 +90,23 @@ class CSV {
         }
 
         function readDirectory(dir, callback, options) {
-            FileSystem.read(dir, ["csv", "xlsx", "xls"], function (err, files) {
+            FileSystem.read(dir, function (err, files) {
                 if (err) {
                     callback(err);
                 } else if (files.length > 0) {
-                    let files = [];
+                    let fileData = [];
 
                     function readFiles(i) {
                         readFile(dir + files[i], function (err, data, columnHeaders) {
                             if (err) {
                                 callback(err);
                             } else {
-                                files.push({file: dir + files[i], data: data, columnHeaders: columnHeaders});
+                                fileData.push({file: dir + files[i], data: data, columnHeaders: columnHeaders});
 
                                 if (i+1 < files.length) {
                                     readFiles(i+1);
                                 } else {
-                                    callback(null, files);
+                                    callback(null, fileData);
                                 }
                             }
                         }, options);
@@ -112,7 +116,7 @@ class CSV {
                 } else {
                     callback(null, []);
                 }
-            });
+            }, {fileExt: ["csv", "xlsx", "xls"]});
         }
 
         function readFile(path, callback, options) {
@@ -136,7 +140,7 @@ class CSV {
                             let workbook = new Excel.Workbook();
                             workbook.xlsx.readFile(path)
                                 .then(function() {
-                                    parseExcel(workbook, options, callback);
+                                    parseExcel(workbook, callback, options);
                                 });
                             break;
                     }
@@ -155,11 +159,11 @@ class CSV {
                     if (err) {
                         callback(err);
                     } else {
-                        callback(dir + file);
+                        callback(null, dir + file);
                     }
                 });
             } else {
-                callback(path);
+                callback(null, path);
             }
         }
     }
