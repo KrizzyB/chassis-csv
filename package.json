@@ -1,0 +1,17 @@
+{
+  "name": "chassis-csv",
+  "version": "0.0.1",
+  "description": "CSV import/export module for the Chassis bootstrapper",
+  "main": "csv.js",
+  "dependencies": {
+    "csv": "^5.3.1",
+    "exceljs": "^3.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kris Sinclair",
+  "repository": "https://github.com/KrizzyB/chassis-csv",
+  "license": "ISC"
+}
