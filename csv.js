@@ -97,11 +97,11 @@ class CSV {
                     let fileData = [];
 
                     function readFiles(i) {
-                        readFile(dir + files[i], function (err, data, columnHeaders) {
+                        readFile(dir + files[i], function (err, data) {
                             if (err) {
                                 callback(err);
                             } else {
-                                fileData.push({file: dir + files[i], data: data, columnHeaders: columnHeaders});
+                                fileData.push({file: dir + files[i], data: data});
 
                                 if (i+1 < files.length) {
                                     readFiles(i+1);
@@ -213,9 +213,9 @@ function parseCSV(file, callback, options) {
                     }
                 }
 
-                callback(null, items, columnHeaders);
+                callback(null, new CSV(items, columnHeaders));
             } else {
-                callback(null, rows);
+                callback(null, new CSV(rows, []));
             }
         }
     });
@@ -271,5 +271,5 @@ function parseExcel(file, callback, options) {
             }
         }
     }
-    callback(null, items, columnHeaders);
+    callback(null, new CSV(items, columnHeaders));
 }
