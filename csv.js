@@ -242,7 +242,10 @@ function parseExcel(file, callback, options) {
                         if (r === 0) {
                             columnHeaders.push(columns[c].value);
                         } else {
-                            if (columns[c] && (columns[c].value === 0 || columns[c].value === "0" || columns[c].value)) {
+                            if (columns[c] && (columns[c].value === 0 || columns[c].value === "0" || columns[c].value)) {   //prevent zeros being seen as falsey
+                                if (typeof columns[c].value === "object") {
+                                    columns[c].value = getCellValue(columns[c].value);
+                                }
                                 if (typeof columns[c].value === "string") {
                                     columns[c].value = columns[c].value.trim();
                                 }
@@ -272,4 +275,26 @@ function parseExcel(file, callback, options) {
         }
     }
     callback(null, new CSV(items, columnHeaders));
+
+    function getCellValue(cell) {
+        let value;
+        let keys = Object.keys(cell);
+
+        for (let k=0; k<keys.length; k++) {
+            if (keys[k] === "result" || keys[k] === "error") {
+                if (typeof cell[keys[k]] === "object") {
+                    value = getCellValue(cell[keys[k]]);
+                } else {
+                    value = cell[keys[k]];
+                    break;
+                }
+            } else {
+                if (typeof cell[keys[k]] === "object") {
+                    value = getCellValue(cell[keys[k]]);
+                }
+            }
+        }
+
+        return value === "#N/A" ? "" : value;
+    }
 }

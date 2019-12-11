@@ -1,6 +1,6 @@
 {
   "name": "chassis-csv",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "CSV import/export module for the Chassis bootstrapper",
   "main": "csv.js",
   "dependencies": {
