@@ -101,7 +101,7 @@ class CSV {
                             if (err) {
                                 callback(err);
                             } else {
-                                fileData.push({file: dir + files[i], data: data});
+                                fileData.push({path: dir + files[i], csv: data});
 
                                 if (i+1 < files.length) {
                                     readFiles(i+1);
